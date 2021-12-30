@@ -1,0 +1,163 @@
+.dialog {
+  width: 518px!important;
+  height: 240px!important;
+  background: #ffffff!important;
+  opacity: 1!important;
+  border-radius: 18px!important;
+}
+
+.text {
+    height: 28px;
+    font-size: 20px;
+    font-family: '.PingFang SC';
+    font-weight: 400;
+    line-height: 28px;
+    color: #37373B;
+    opacity: 1;
+    text-align: center;
+    margin-top: 30px;
+}
+.btn {
+    width: 148px;
+    height: 46px;
+    background: #FF6246;
+    opacity: 1;
+    border-radius: 23px;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 25px;
+    color: #FFFFFF;
+    opacity: 1;
+}
+::v-deep .el-dialog__close{
+    width: 16px;
+    height: 16px;
+    color: #C0C4CC;
+    opacity: 1;
+}
+.bind_card {
+    background-size: contain!important;
+    background-repeat: no-repeat!important;
+    height: 253px;
+    overflow: hidden;
+    font-size: 20px;
+    font-weight: 600;
+    color: #FFFFFF;
+    text-align: center;
+    opacity: 1;
+    position: relative;
+    display: flex;
+    //justify-content: center;
+    line-height: 225px;
+    width: 100%;
+    cursor: pointer;
+    background-position: 20%;
+}
+.el-card {
+
+    /deep/ .el-card__body {
+        padding: 0;
+    }
+}
+.my-dialog {
+    border-radius: 10px!important;
+    ::v-deep .el-dialog__header {
+        padding: 0!important;
+    }
+}
+.card-text {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 17px;
+    color: #9E9EA6;
+    opacity: 1;
+}
+.input {
+    input{
+        background:  #F5F5FA!important;
+    }
+}
+input::placeholder {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    color: #C8C8D3;
+    opacity: 1;
+}
+.uploadBox {
+    display: flex;
+    margin-top: 20px;
+    justify-content: space-around;
+}
+.stepBtn {
+    width: 180px;
+    height: 40px;
+    opacity: 1;
+    border-radius: 5px;
+}
+.foot_new {
+    display: flex;
+    justify-content: space-around;
+    align-content: center;
+    width: 100%;
+}
+.dayMoney {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    color: #9E9EA6;
+    opacity: 1;
+    margin-top: 12px;
+    margin-bottom: 18px;
+}
+.moreText {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 14px;
+    color: #C8C8D3;
+    opacity: 1;
+}
+
+.green {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 17px;
+    color: #21B384;
+}
+.red {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 17px;
+    color: #F21E37;
+    opacity: 1;
+}
+.card-right {
+    margin-top: 38px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+
+}
+.margin-bottom-8 {
+    padding-bottom: 8px!important;
+}
+.card-right_tx {
+    display: flex;
+    white-space: nowrap;
+    margin-top: 14px;
+    div {
+        font-size: 16px;
+        font-family: 'PingFang SC';
+        font-weight: 600;
+        line-height: 22px;
+        color: #FF7E67;
+        opacity: 1;
+    }
+}
+
+::v-deep .el-card{
+   border-radius: 10px!important;
+}
+.el-col{
+    padding: 4px 8px!important;
+}

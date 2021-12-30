@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #c8c8d3;
+      }
+
+      .cls-2 {
+        fill: none;
+        stroke: #fff;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 2px;
+      }
+    </style>
+  </defs>
+  <g id="组_654" data-name="组 654" transform="translate(-57 -199)">
+    <circle id="更换银行卡" class="cls-1" cx="11" cy="11" r="11" transform="translate(57 199)"/>
+    <path id="路径_147" data-name="路径 147" class="cls-2" d="M7.272,0,4.941,2.331a1.845,1.845,0,0,1-2.609,0L0,0" transform="translate(66.591 214.037) rotate(-90)"/>
+  </g>
+</svg>

@@ -1,0 +1,2205 @@
+<template>
+  <div class="nr">
+    <el-row :gutter="20">
+      <el-col :span="8">
+        <div class="grid-content bg-purple">
+          <el-card>
+            <div class="box-card">
+              <div class="card-left">
+                <p
+                  class="dayMoney "
+                  style="margin-top: 4px;font-size: 14px;color:#9E9EA6;"
+                >
+                  昨日待结算
+                </p>
+                <p>
+                  <span style="color:#37373B; font-size: 18px">￥</span
+                  ><span
+                    style="margin-left: 10px; color:#37373B;font-size: 36px;font-family:PingFang SC;font-weight: 600;"
+                    >{{ day_income }}</span
+                  >
+                </p>
+              </div>
+              <div class="card-right">
+                <div class="margin-bottom-8">
+                  <div class="moreText" style="color: #C8C8D3">周同比</div>
+                  <div class="green" style="padding-left: 10px;font-size: 12px">
+                    0%-
+                  </div>
+                </div>
+                <div style="height: 8px"></div>
+                <div class="margin-bottom-8">
+                  <div class="moreText" style="color: #C8C8D3">日同比</div>
+                  <div class="red" style="padding-left: 10px;font-size: 12px">
+                    0%-
+                  </div>
+                </div>
+              </div>
+            </div>
+          </el-card>
+        </div>
+      </el-col>
+      <el-col :span="8">
+        <div class="grid-content bg-purple">
+          <el-card>
+            <div class="box-card1">
+              <div class="card-left">
+                <p class="dayMoney">可提现金额</p>
+                <p>
+                  <span style="color: rgb(55, 55, 59); font-size: 18px;"
+                    >￥</span
+                  ><span
+                    style="margin-left: 10px; color: rgb(55, 55, 59); font-size: 36px; font-family: 'PingFang SC'; font-weight: 600;"
+                    >{{ withdrawal }}</span
+                  >
+                </p>
+              </div>
+              <div class="card-right_tx">
+                <div @click="txjl(1, undefined, true)">提现记录></div>
+                <div
+                  style="margin: 0 0 0 26px;text-align: right"
+                  @click="tixian()"
+                >
+                  提现>
+                </div>
+              </div>
+            </div>
+          </el-card>
+        </div>
+      </el-col>
+      <el-dialog
+        class="drawMoney"
+        :visible.sync="centerDialogVisible5"
+        width="82.2%"
+      >
+        <span slot="title" class="drawHistory">提现记录</span>
+        <div class="txjl">
+          <div class="txjl_top">
+            <div>
+              <span class="dayChose">日期选择</span>
+              <el-date-picker
+                class="picker"
+                v-model="value10"
+                type="date"
+                placeholder="选择日期"
+              >
+              </el-date-picker>
+              <span
+                style="
+                    padding: 0 17px;
+                    font-size: 14px;
+                    font-family: PingFang SC;
+                    font-weight: 400;
+                    line-height: 20px;
+                    color: #9E9EA6;
+                    opacity: 1;"
+                >至</span
+              >
+              <el-date-picker
+                class="picker"
+                v-model="value11"
+                type="date"
+                placeholder="选择日期"
+              >
+              </el-date-picker>
+            </div>
+            <div class="drawBox">
+              <span class="drawStatus">提现状态</span>
+              
+              <el-select v-model="value12" class="statusSelect" placeholder="请选择">
+                <el-option
+                  v-for="item in options6"
+                  :key="item.value12"
+                  :label="item.label6"
+                  :value="item.value12"
+                >
+                </el-option>
+              </el-select>
+              <el-button
+                class="choseBtn"
+                style="background-color:#FF6246;color: #ffffff"
+                @click="shaixuan"
+                >筛选</el-button
+              >
+            </div>
+
+          </div>
+          <div class="txjl_bottom">
+            <el-table :data="tableData1" style="width: 100%; margin-top: 36px;">
+              <el-table-column prop="add_time" label="申请时间" min-width="10%">
+              </el-table-column>
+              <el-table-column prop="money" label="金额(元)" min-width="10%">
+                  <template slot-scope="{ row: { money } }">
+                      <span class="green">{{ money | local }}</span>
+                  </template>
+              </el-table-column>
+              <el-table-column prop="dzyh" label="到账银行卡" min-width="10%">
+              </el-table-column>
+              <el-table-column prop="status" label="状态" min-width="10%">
+                  <template slot-scope="{ row: { status } }">
+                      <span>{{ status == 0 ? "提现申请中" : "提现成功" }}</span>
+                  </template>
+              </el-table-column>
+              <el-table-column prop="bz1" label="附加信息" min-width="20%">
+                  <template slot-scope="{ row: { bz1 } }">
+                      <span>{{ bz1 || "无" }}</span>
+                  </template>
+              </el-table-column>
+              <el-table-column prop="name" label="操作人" min-width="10%">
+              </el-table-column>
+              <el-table-column
+                prop="sn"
+                label="账单编号|流水号"
+                min-width="20%"
+              >
+              </el-table-column>
+            </el-table>
+            <div style="margin-top: 33px;width: 100%; display: flex; align-items: center; justify-content: flex-end">
+                  <div
+                    :class="[
+                      'point',
+                      'page',
+                      currentpage !== 1 ? 'yellow' : '',
+                    ]"
+                    @click="txjl(currentpage1-1, currentpage1 !== 1)"
+                  >
+                    上一页
+                  </div>
+                  <el-pagination
+                    background
+                    @current-change="txjl"
+                    :current-page="this.currentpage1"
+                    :page-size="10"
+                    layout="pager"
+                    :total="TotalRows1"
+                  >
+                  </el-pagination>
+                  <div
+                    :class="[
+                      'point',
+                      'page',
+                      currentpage1 !== Math.ceil(TotalRows1 / 10) ? 'yellow' : '',
+                    ]"
+                    @click="
+                      txjl(currentpage1+1, currentpage1 !== Math.ceil(TotalRows1 / 10))
+                    "
+                  >
+                    下一页
+                  </div>
+                  <p
+                    style="
+                                      margin-left: 50px;
+                                      font-size: 13px;
+                                      font-family: PingFang SC;
+                                      font-weight: 400;
+                                      line-height: 18px;
+                                      color: #9E9EA6;
+                                      opacity: 1;"
+                  >
+                    共{{ currentpage1 }}/{{ Math.ceil(TotalRows1 / 10) }}
+                  </p>
+                </div>
+          </div>
+        </div>
+        
+      </el-dialog>
+      <el-dialog
+        title="可用金额提现"
+        :visible.sync="centerDialogVisible4"
+        width="30%"
+      >
+        <el-steps :active="active2" finish-status="success" v-if="bz">
+          <el-step title="发起提现申请"></el-step>
+          <el-step title="银行处理中"></el-step>
+          <el-step title="完成"></el-step>
+        </el-steps>
+        <div class="txje1" v-if="active2 == 0">
+          <div class="dzzh">
+            <div>到账账户</div>
+            <div style="margin-left:3%">
+              <div>黄飒(**** **** **** 3782)</div>
+              <div>预计24小时内到账，请注意查收</div>
+            </div>
+          </div>
+          <div class="txgz">
+            <div>
+              提现规则
+              <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-yiwen"></use>
+              </svg>
+            </div>
+          </div>
+          <div>
+            <div>
+              <div>提现金额</div>
+              <div>本月仍可提现<span>1</span>次</div>
+            </div>
+            <div>
+              <el-input class="jine" v-model="input4"></el-input>
+            </div>
+            <div>可提现金额不足1元，本次无法提现。</div>
+          </div>
+        </div>
+        <div class="txje2" v-if="active2 == 1">
+          <div><span>提现金额</span><span>￥579.40</span></div>
+          <div><span>服务费</span><span>￥0.60</span></div>
+          <div>
+            <span>到账银行卡</span><span>工商银行</span><span>尾号3782</span>
+          </div>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="qrtx()">确认提现</el-button>
+        </span>
+      </el-dialog>
+      <el-col :span="8">
+        <div class="grid-content bg-purple">
+          <el-card>
+            <div class="card-left">
+              <div style="font-size:14px;color: #9E9EA6;">
+                待结算金额
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  :content="jiaoyi"
+                  placement="right"
+                >
+                  <el-button type="text">
+                    <svg class="icon" aria-hidden="true">
+                      <use xlink:href="#icon-yiwen"></use></svg
+                  ></el-button>
+                </el-tooltip>
+              </div>
+              <div style="margin-top: 18px;">
+                <span class="moreText" style="color:#37373B;">￥</span
+                ><span
+                  style="color:#37373B;font-size: 36px;font-family:PingFang SC;font-weight: 600;"
+                  >{{ djs_income }}</span
+                >
+              </div>
+            </div>
+          </el-card>
+        </div>
+      </el-col>
+    </el-row>
+    <el-row :gutter="20" style="margin-top: 10px; display: flex">
+      <el-col :span="16">
+        <div class="grid-content bg-purple">
+          <el-card id="el-card">
+            <div
+              style="margin: 24px 20px;font-size: 20px;color: #373738;font-weight: bold"
+            >
+              收益趋势
+            </div>
+            <div class="card_nr">
+              <div class="card_nr_top">
+                <div class="left">
+                  <div
+                    style="width: 56px;
+                                        height: 20px;
+                                        font-size: 14px;
+                                        font-family: PingFang SC;
+                                        font-weight: 400;
+                                        line-height: 10px;
+                                        color: #9E9EA6;
+                                        opacity: 1;"
+                  >
+                    统计时间
+                  </div>
+                  <div style="margin-left: 22px;">
+                    <el-select v-model="value13" placeholder="请选择">
+                      <el-option
+                        v-for="item in options13"
+                        :key="item.value13"
+                        :label="item.label13"
+                        :value="item.value13"
+                      >
+                      </el-option>
+                    </el-select>
+                  </div>
+                </div>
+
+                <div style="display: flex; align-items: center; ">
+                  <span
+                    style="width: 12px;
+                                          height: 12px;
+                                          background: #FFFFFF;
+                                          border: 3px solid #FF6246;
+                                          border-radius: 50%;
+                                          opacity: 1;"
+                  ></span>
+                  <span
+                    style="width: 65px;
+                                          margin-left: 9px;
+                                          margin-right: 50px;
+                                            height: 18px;
+                                            font-size: 13px;
+                                            font-family: PingFang SC;
+                                            font-weight: 400;
+                                            line-height: 18px;
+                                            color: #C8C8D3;
+                                            opacity: 1;"
+                    >当前总收益</span
+                  >
+                </div>
+              </div>
+              <div id="box1"></div>
+            </div>
+          </el-card>
+        </div>
+      </el-col>
+      <el-col :span="8">
+        <div class="grid-content bg-purple bind">
+          <el-card id="el-card1" style="padding: 0">
+            <div class="card-left1">
+              <div class="card-left1_top">
+                提现账户
+              </div>
+              <div class="card-left1_center">
+                <div
+                  class="bind_card"
+                  v-if="weibang"
+                  @click="bangding()"
+                  :style="{
+                    // background: `url( ${  require(!bankMsg.id ? '../../assets/weitianjia.png' : '../../assets/yhkbj.png')} )`,
+                    'line-height': !bankMsg.id ? '253px' : '25px',
+                    'align-items': 'center'
+                  }"
+                >
+                  <img src="../../assets/yhkbj.png" style="width: 385px;height: 243px;position: relative">
+                  <div style="width:385px;position: absolute;top: 30%">
+                      <span v-if="!bankMsg.id">点击绑定银行卡</span>
+                      <div v-else class="banMsk">
+                          <span>{{ bankMsg.yhk }}</span>
+                      </div>
+                    <div style="display: flex; text-align:left;margin-left: 15%;margin-top: 10%;font-size: 14px">
+                      <div>
+                        <div style="opacity: 0.6">持有者</div>
+                        <div>{{ bankMsg.name }}</div>
+                      </div>
+                        <div style="margin-left: 20px">
+                          <div  style="opacity: 0.6">所属银行</div>
+                          <div>中国建设银行</div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                <div v-else>
+<!--                  <img-->
+<!--                    class="card-left1_center_yhk"-->
+<!--                    src="../../assets/yhkbj.png"-->
+<!--                  />-->
+<!--                  <div class="card-left1_center_nr">-->
+<!--                    ****&nbsp; ****&nbsp; ****&nbsp; 1234-->
+<!--                  </div>-->
+<!--                  <div class="card-left1_center_xx">-->
+<!--                    <div class="card-left1_center_xx_ckr">-->
+<!--                      <div style="opacity: 0.6;font-size: 14px;color: #ffffff">-->
+<!--                        持有者-->
+<!--                      </div>-->
+<!--                      <div style="font-size: 14px;color: #ffffff">黄飒</div>-->
+<!--                    </div>-->
+<!--                    <div class="card-left1_center_xx_ssh">-->
+<!--                      <div style="opacity: 0.6;font-size: 14px;color: #ffffff">-->
+<!--                        所属行-->
+<!--                      </div>-->
+<!--                      <div style="font-size: 14px;color: #ffffff">盛京银行</div>-->
+<!--                    </div>-->
+<!--                  </div>-->
+                </div>
+              </div>
+              <div class="ghyhk" @click="ghyhk()">
+                <div class="ghyhk_nr">
+                  <div class="ghyhk_nr_nr">
+                    <div>更换银行卡</div>
+                    <div><img src="../../icon/yhk.svg" /></div>
+                  </div>
+                </div>
+              </div>
+
+              <el-dialog
+                :visible.sync="centerDialogVisible1"
+                width="30%"
+                :show-close="false"
+                custom-class="dialog"
+              >
+                <p class="text">亲爱的，你还没有绑定银行卡，无法提现噢！</p>
+                <div slot="footer" class="dialog-footer foot_new">
+                  <el-button class="btn" type="primary" @click="bang()" round
+                    >去绑定</el-button
+                  >
+                  <el-button
+                    class="btn"
+                    style="background:#9E9EA6; color: white"
+                    @click="centerDialogVisible1 = false"
+                    round
+                    >取 消</el-button
+                  >
+                </div>
+              </el-dialog>
+              <el-dialog
+                :visible.sync="centerDialogVisible2"
+                width="800px"
+                :show-close="false"
+                custom-class="my-dialog"
+              >
+                <Step :progress="setpStatus" slot="title" />
+                <!-- TODO:第一步 -->
+                <el-form
+                  v-show="setpStatus === 1"
+                  :rules="rule"
+                  label-position="top"
+                  :model="form"
+                  ref="form"
+                  class="form"
+                >
+                  <el-form-item label="真实姓名" required prop="name">
+                    <el-input
+                      v-model="form.name"
+                      @input="namebl($event)"
+                      class="input"
+                      placeholder="请输入真实姓名"
+                      style="width: 343px; background: #F5F5FA;margin-left: 14px;"
+                    ></el-input>
+                    <svg class="icon" aria-hidden="true" style="margin-left: 10px;" v-if="duihao">
+                    <use xlink:href="#icon-a-zhengque1"></use>
+                  </svg>
+                  </el-form-item>
+                  <el-form-item label="身份证号" required prop="idcard">
+                    <el-input
+                      v-model="form.idcard"
+                      @input="sfzbl"
+                      class="input"
+                      placeholder="请输入身份证号"
+                      style="width: 343px; background: #F5F5FA;margin-left: 14px;"
+                    ></el-input>
+                    <svg class="icon" aria-hidden="true" style="margin-left: 10px;" v-if="duihao1">
+                      <use xlink:href="#icon-a-zhengque1"></use>
+                    </svg>
+                  </el-form-item>
+                  <el-form-item label="身份证件" required prop="idcard_img_h">
+                    <p class="card-text">
+                      请上传身份证的正面，照片格式为JPG/PNG，且大小不超过2M；身份证必须显示完整，不能缺角，背景纯净
+                    </p>
+                    <div class="uploadBox">
+                      <Upload1 
+                      @changeImg="(e) => (form.idcard_img_q = e)" 
+                      :form="form"
+                      :imgsType="1"
+                      @disable="(e) => (disable = e)"
+                      />
+                      <Upload1
+                        text="身份证国徽面"
+                        class="upload2"
+                        @changeImg="(e) => (form.idcard_img_h = e)"
+                        :form="form"
+                      :imgsType="2"
+                      @disable="(e) => (disable = e)"
+                      />
+                    </div>
+                  </el-form-item>
+                  <el-form-item
+                    :class="[disable ? 'dis':'']"
+                    style="display: flex; justify-content: center; align-items: center; margin-top: 30px;"
+                  >
+                    <el-button :class="['stepBtn', disable ? 'gray' : '']"  @click="nextStep">下一步</el-button>
+                  </el-form-item>
+                </el-form>
+                <!-- 第二步 -->
+                <div v-show="setpStatus === 2">
+                  <StepTwo @changeStep="changeStep" />
+                </div>
+
+                <div v-show="setpStatus === 3">
+                  <StepThree @hide="hideCallback" />
+                </div>
+
+                <div class="smrz3" v-if="active == 2">
+                  <div>提交成功，请耐心等待审核结果</div>
+                  <div>审核结果将在24小时内通过系统消息通知，如有疑问</div>
+                  <div>请联系微信公众号：备考猫</div>
+                </div>
+                <!--                                <el-button style="margin-top: 12px;" @click="next">下一步</el-button>-->
+                <span slot="footer" class="dialog-footer"> </span>
+              </el-dialog>
+              <el-dialog
+                :visible.sync="centerDialogVisible3"
+                width="40%"
+                :show-close="false"
+                class="yhkclass"
+                ref="form1"
+                @GetKey="GetCon()"
+              >
+                <buzhou></buzhou>
+                <Fenye  v-show="setpStatus1==1"></Fenye>
+                <Fenye1 v-show="setpStatus1==2"></Fenye1>
+<!--                <el-steps :active="active1" finish-status="success">-->
+<!--                  <el-step title="补全银行卡账号信息"></el-step>-->
+<!--                  <el-step title="提交审核"></el-step>-->
+<!--                </el-steps>-->
+<!--                <div class="smrz2" v-if="active1 == 0">-->
+<!--                  <div>-->
+<!--                    <div>-->
+<!--                      <p><span>*</span>选择开户银行</p>-->
+<!--                    </div>-->
+<!--                    <div>-->
+<!--                      <el-select v-model="value8" placeholder="请选择">-->
+<!--                        <el-option-->
+<!--                          v-for="item in options2"-->
+<!--                          :key="item.value6"-->
+<!--                          :label="item.label2"-->
+<!--                          :value="item.value6"-->
+<!--                        >-->
+<!--                        </el-option>-->
+<!--                      </el-select>-->
+<!--                    </div>-->
+<!--                    <div>-->
+<!--                      <el-select v-model="value9" placeholder="请选择">-->
+<!--                        <el-option-->
+<!--                          v-for="item in options4"-->
+<!--                          :key="item.value8"-->
+<!--                          :label="item.label4"-->
+<!--                          :value="item.value8"-->
+<!--                        >-->
+<!--                        </el-option>-->
+<!--                      </el-select>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                  <div>-->
+<!--                    <div>-->
+<!--                      <p><span>*</span>银行账号</p>-->
+<!--                    </div>-->
+<!--                    <div>-->
+<!--                      <el-input-->
+<!--                        v-model="input3"-->
+<!--                        placeholder="请输入银行账号"-->
+<!--                      ></el-input>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                  <div>-->
+<!--                    <div>-->
+<!--                      <p><span>*</span>上传银行卡照片</p>-->
+<!--                    </div>-->
+<!--                    <div>-->
+<!--                      <div>-->
+<!--                        请上传银行卡的正反面，照片格式为JPG/PNG，且大小不超过2M；银行卡必须显示完整，不能缺角，背景纯净，数字显示清晰-->
+<!--                      </div>-->
+<!--                      <div class="sctp">-->
+<!--                        <div>-->
+<!--                          <el-upload-->
+<!--                            action="https://jsonplaceholder.typicode.com/posts/"-->
+<!--                            list-type="picture-card"-->
+<!--                            :on-preview="handlePictureCardPreview2"-->
+<!--                            :on-remove="handleRemove2"-->
+<!--                          >-->
+<!--                            <i class="el-icon-plus"></i>-->
+<!--                          </el-upload>-->
+<!--                          <el-dialog :visible.sync="dialogVisible4">-->
+<!--                            <img width="100%" :src="dialogImageUrl4" alt="" />-->
+<!--                          </el-dialog>-->
+<!--                        </div>-->
+<!--                        <div>-->
+<!--                          <el-upload-->
+<!--                            action="https://jsonplaceholder.typicode.com/posts/"-->
+<!--                            list-type="picture-card"-->
+<!--                            :on-preview="handlePictureCardPreview3"-->
+<!--                            :on-remove="handleRemove3"-->
+<!--                          >-->
+<!--                            <i class="el-icon-plus"></i>-->
+<!--                          </el-upload>-->
+<!--                          <el-dialog :visible.sync="dialogVisible5">-->
+<!--                            <img width="100%" :src="dialogImageUrl5" alt="" />-->
+<!--                          </el-dialog>-->
+<!--                        </div>-->
+<!--                      </div>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="smrz3" v-if="active1 == 1">-->
+<!--                  <div>提交成功，请耐心等待审核结果</div>-->
+<!--                  <div>审核结果将在24小时内通过系统消息通知，如有疑问</div>-->
+<!--                  <div>请联系微信公众号：备考猫</div>-->
+<!--                </div>-->
+<!--                <el-button-->
+<!--                  style="margin-top: 12px;"-->
+<!--                  @click="centerDialogVisible3 = false"-->
+<!--                  >关闭</el-button-->
+<!--                >-->
+<!--                <el-button style="margin-top: 12px;" @click="next1"-->
+<!--                  >提交审核</el-button-->
+<!--                >-->
+<!--                <span slot="footer" class="dialog-footer"> </span>-->
+              </el-dialog>
+            </div>
+          </el-card>
+        </div>
+      </el-col>
+    </el-row>
+    <el-row :gutter="20" style="margin-top: 10px;">
+      <el-col :span="24">
+        <div class="grid-content bg-purple">
+          <el-card id="el-card2">
+            <div class="box-card2">
+              <div
+                style=" padding-left: 48px;height: 95px; line-height: 95px;font-size: 20px;color: #373738;font-weight: bold"
+              >
+                收益明细
+              </div>
+              <div class="box-card2_center" style="margin-left: 48px">
+                <div style="display: flex; ">
+                  <div>
+                    <div
+                      class="riqi"
+                      style="display: flex; align-items: center;"
+                    >
+                      <div
+                        style="width: 56px;
+                                              height: 20px;
+                                              font-size: 14px;
+                                              font-family: PingFang SC;
+                                              font-weight: 400;
+                                              line-height: 20px;
+                                              color: #9E9EA6;
+                                              opacity: 1;"
+                      >
+                        日期选择
+                      </div>
+                      <el-date-picker
+                        style="margin-left: 24px"
+                        type="date"
+                        placeholder="年-月-日"
+                        v-model="value3"
+                        :picker-options="pickerOptions3"
+                      ></el-date-picker>
+                      <span
+                        style="
+                                                margin: 0 10px;
+                                                font-size: 14px;
+                                                font-family: PingFang SC;
+                                                font-weight: 400;
+                                                line-height: 20px;
+                                                color: #9E9EA6;
+                                                opacity: 1;"
+                        >至</span
+                      >
+                      <el-date-picker
+                        placeholder="年-月-日"
+                        v-model="value4"
+                        :picker-options="pickerOptions4"
+                      ></el-date-picker>
+                    </div>
+                  </div>
+                  <div style="display: flex; margin-left:10%;">
+                  <div
+                    @click="jin()"
+                    :class="['btn48', activeDay === 0 ? 'active' : '']"
+                  >
+                    今
+                  </div>
+                  <div
+                    @click="zuo()"
+                    :class="['btn48', activeDay === 1 ? 'active' : '']"
+                  >
+                    昨
+                  </div>
+                  <div
+                    @click="seven()"
+                    :class="['btn74', activeDay === 2 ? 'active' : '']"
+                  >
+                    近7天
+                  </div>
+                  <div
+                    @click="thirty()"
+                    :class="['btn74', activeDay === 3 ? 'active' : '']"
+                  >
+                    近30天
+                  </div>
+                </div>
+                </div>
+                <div class="flex_center">
+                <div class="box-card2_center_zt ">
+                  <div class="samllText" style="margin-left: 25px">交易状态</div>
+                  <el-select
+                    style="margin-left: 24px;     width: 154px;"
+                    v-model="value5"
+                    placeholder="请选择"
+                  >
+                    <el-option
+                      v-for="item in options1"
+                      :key="item.value5"
+                      :label="item.label1"
+                      :value="item.value5"
+                    >
+                    </el-option>
+                  </el-select>
+                </div>
+                <div>
+                  <el-button
+                    style="width: 109px;
+                            margin-right:150px;
+                                    border: none;
+                                        height: 42px;
+                                        font-weight: 600;
+                                        font-size: 18px;
+                                        color: #fff;
+                                        background: #FF6246;
+                                        opacity: 1;
+                                        margin-top: -5px;
+                                        border-radius: 5px;"
+
+                    >筛选
+                  </el-button>
+                </div>
+                <div style="font-size: 16px; margin-left: 55px;" class="daochu" @click="daochu()">
+                  <svg class="icon" aria-hidden="true">
+                    <use xlink:href="#icon-a-lujing255"></use>
+                  </svg>
+                  <span
+                    style="
+                                        margin-top: -5px;
+                                        font-size: 16px;
+                                        font-family: PingFang SC;
+                                        font-weight: 400;
+                                        line-height: 22px;
+                                        color: #3C52E0;
+                                        margin-right: 66px;
+                                        opacity: 1;"
+                    >导出EXCEL</span
+                  >
+                  </div>
+                </div>
+              </div>
+              <div
+                style="padding-top: 10px; width: calc(100% - 100px); margin-left: 48px"
+              >
+                <el-table
+                  :data="tableData"
+                  :header-cell-style="{
+                    background: '#F5F5FA',
+                    color: '#68686F',
+                  }"
+                  style="width: 100%"
+                >
+                  <el-table-column prop="add_time" label="日期" min-width="10%">
+                  </el-table-column>
+                  <el-table-column prop="title" label="名称" min-width="20%">
+                  </el-table-column>
+                  <el-table-column
+                    prop="fwl"
+                    label="新增观看用户数"
+                    min-width="10%"
+                  >
+                  </el-table-column>
+                  <el-table-column
+                    prop="money"
+                    label="收入(元)"
+                    min-width="10%"
+                  >
+                    <p class="green" slot-scope="{ row }">
+                      <span style="margin-right: 3px">+</span>
+                      <span style="margin-right: 3px">¥</span>
+                      <span>{{ row.money }}</span>
+                    </p>
+                  </el-table-column>
+                  <el-table-column prop="status" label="状态" min-width="10%">
+                  </el-table-column>
+                  <el-table-column
+                    prop="sn"
+                    label="订单编号|流水号"
+                    min-width="10%"
+                  >
+                  </el-table-column>
+                  <el-table-column prop="xz" label="报表下载" min-width="10%">
+                    <p
+                      slot-scope="{ row }"
+                      style="
+                                          font-size: 14px;
+                                          font-family: PingFang SC;
+                                          font-weight: 400;
+                                          line-height: 20px;
+                                          color: #3C52E0;
+                                          opacity: 1; cursor: pointer"
+                    >
+                      下载报表
+                    </p>
+                  </el-table-column>
+                </el-table>
+                <div style="margin-top: 29px;width: 100%; display: flex; align-items: center; justify-content: flex-end">
+                  <div
+                    :class="[
+                      'point',
+                      'page',
+                      currentpage !== 1 ? 'yellow' : '',
+                    ]"
+                    @click="goPage(-1, currentpage !== 1)"
+                  >
+                    上一页
+                  </div>
+                  <el-pagination
+                    background
+                    @current-change="handleCurrentChange"
+                    :current-page="this.currentpage"
+                    :page-size="this.pagesize"
+                    layout="pager"
+                    :total="TotalRows"
+                  >
+                  </el-pagination>
+                  <div
+                    :class="[
+                      'point',
+                      'page',
+                      currentpage !== Math.ceil(TotalRows / 10) ? 'yellow' : '',
+                    ]"
+                    @click="
+                      goPage(1, currentpage !== Math.ceil(TotalRows / 10))
+                    "
+                  >
+                    下一页
+                  </div>
+                  <p
+                    style="
+                                      margin-left: 50px;
+                                      font-size: 13px;
+                                      font-family: PingFang SC;
+                                      font-weight: 400;
+                                      line-height: 18px;
+                                      color: #9E9EA6;
+                                      opacity: 1;"
+                  >
+                    共{{ currentpage }}/{{ Math.ceil(TotalRows / 10) }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </el-card>
+        </div>
+      </el-col>
+    </el-row>
+  </div>
+</template>
+
+<script>
+import echarts from "echarts";
+import { request } from "@/network/request/request";
+import Step from "./components/step";
+import Upload1 from "../../common/upload/upload1";
+import Upload2 from "@/common/upload/upload2.vue";
+import StepTwo from "./components/stepTwo";
+import StepThree from "./components/stepThree.vue";
+import Fenye from "./ghyhk/Fenye.vue";
+import Fenye1 from "./ghyhk/Fenye1.vue";
+import buzhou from "./ghyhk/buzhou.vue";
+import { withdrawalBindBank } from "@/http/home/home";
+import { getStorage } from "@/http/http";
+import { withdrawalWithdrawalLog } from "@/http/draw/draw";
+export default {
+  name: "czsy",
+  data() {
+    return {
+      bankMsg: {},
+      setpStatus: 1, // 步骤
+      setpStatus1:1,
+      success: true,
+      form: {
+        name: "",
+        idcard: "",
+        idcard_img_q: '',
+        idcard_img_h: '',
+      },
+      disable: true,
+      stepTwoObj: {},
+      pickerOptions1: {
+        disabledDate: (time) => {
+          if (this.value2) {
+            return time.getTime() > this.value2;
+          } else {
+            return time.getTime() > Date.now();
+          }
+        },
+      },
+      pickerOptions2: {
+        disabledDate: (time) => {
+          if (this.value2) {
+            return time.getTime() < this.value1;
+          }
+          return time.getTime() < Date.now() - 8.64e7;
+        },
+      },
+      pickerOptions3: {
+        disabledDate: (time) => {
+          if (this.value2) {
+            return time.getTime() > this.value2;
+          } else {
+            return time.getTime() > Date.now();
+          }
+        },
+      },
+      pickerOptions4: {
+        disabledDate: (time) => {
+          if (this.value2) {
+            return time.getTime() < this.value1;
+          }
+          return time.getTime() < Date.now() - 8.64e7;
+        },
+      },
+      value: "",
+      value1: "",
+      value2: "",
+      value3: "",
+      value4: "",
+      value5: "",
+      value6: "",
+      value7: "",
+      value8: "",
+      value9: "",
+      value10: "",
+      value11: "",
+      value12: "",
+      value13:'近7天',
+      options13: [
+        {
+          value13: "7day",
+          label13: "近7天",
+        },
+        {
+          value13: "30day",
+          label13: "近30天",
+        },{
+          value13: "year",
+          label13: "近一年",
+        }],
+      options1: [
+        {
+          value5: "",
+          label1: "全部",
+        },
+        {
+          value5: 1,
+          label1: "交易成功",
+        },
+        {
+          value5: 2,
+          label1: "待结算",
+        },
+
+      ],
+      options2: [
+        {
+          value6: "选项1",
+          label2: "沈阳",
+        },
+      ],
+      options3: [
+        {
+          value7: "选项1",
+          label3: "盛京银行",
+        },
+      ],
+      options4: [
+        {
+          value8: "选项1",
+          label4: "盛京银行",
+        },
+      ],
+      options5: [
+        {
+          value9: "选项1",
+          label5: "盛京银行",
+        },
+      ],
+      options6:[
+        {
+          value12: "2",
+          label6: "全部",
+        },
+        {
+          value12: "0",
+          label6: "提现申请中",
+        },
+        {
+          value12: "1",
+          label6: "提现成功",
+        },
+      ],
+      tableData: [],
+      tableData1: [],
+      day_income: "",
+      withdrawal: "",
+      djs_income: "",
+      TotalRows: 2,
+      TotalRows1: 2,
+      currentpage: 1,
+      currentpage1: 1,
+      pagesize: 1,
+      pagesize1: 1,
+      day: "day",
+      yesterday: "yesterday",
+      sevenday: "7day",
+      thirtyday: "30day",
+      centerDialogVisible1: false,
+      centerDialogVisible2: false,
+      centerDialogVisible3: false,
+      centerDialogVisible4: false,
+      centerDialogVisible5: false,
+      active: 0,
+      active1: 0,
+      active2: 0,
+      input: "",
+      input1: "",
+      input2: "",
+      input3: "",
+      input4: "￥",
+      dialogImageUrl1: "",
+      dialogImageUrl: "",
+      dialogImageUrl2: "",
+      dialogImageUrl3: "",
+      dialogImageUrl4: "",
+      dialogImageUrl5: "",
+      dialogVisible1: false,
+      dialogVisible: false,
+      dialogVisible2: false,
+      dialogVisible3: false,
+      dialogVisible4: false,
+      dialogVisible5: false,
+      bz: false,
+      add_time: "",
+      money: "",
+      dzyh: "",
+      status: "",
+      sn: "",
+      bz1: "",
+      weibang: true,
+      jiaoyi: "交易未完成的订单总额，消费者确认\n收货后将自动转入店铺余额",
+      activeDay: 0,
+      duihao:false,
+      duihao1:false,
+      qsdata:[],
+      qsdate:[],
+    };
+  },
+  mounted() {
+    this.GetPageList();
+    this.biao();
+    this.txjl();
+    this.qushi();
+  },
+  computed: {
+    rule() {
+      return {
+        name: [
+          {
+            required: true,
+            message: "请输真实姓名",
+            trigger: ["blur", "change"],
+          },
+        ],
+        idcard: [
+          {
+            required: true,
+            message: "请输入身份证号",
+            trigger: ["blur", "change"],
+          },
+          {
+            pattern: /(^\d{8}(0\d|10|11|12)([0-2]\d|30|31)\d{3}$)|(^\d{6}(18|19|20)\d{2}(0[1-9]|10|11|12)([0-2]\d|30|31)\d{3}(\d|X|x)$)/,
+            message: "请输入正确身份证号",
+          },
+        ],
+        idcard_img_q: [
+          {
+            validator: function(rule, value, callback) {
+              console.log(value);
+              if (!value) {
+                callback(new Error("请上传身份证正面"));
+              }
+              callback();
+            },
+            trigger: ["change"],
+          },
+        ],
+        idcard_img_h: [
+          {
+            validator: function(rule, value, callback) {
+              console.log(value);
+              if (!value) {
+                callback(new Error("请上传身份证背面"));
+              }
+              callback();
+            },
+            trigger: ["change"],
+          },
+        ],
+      };
+    },
+    ruleSetp2() {
+      return {};
+    },
+  },
+  components: {
+    Step,
+    Upload1,
+    StepTwo,
+    StepThree,
+    Fenye,
+    Fenye1,
+    buzhou,
+  },
+  watch: {
+      form: {
+          deep: true,
+          handler(v) {
+              if(v.name && v.idcard && v.idcard_img_q&&v.idcard_img_h) {
+                  this.disable = false;
+              }else {
+                  this.disable = true;
+              }
+          },
+          immediate: true
+      }
+  },
+  filters: {
+      local(v) {
+          return `¥ ${(+v).toLocaleString()}`;
+      }
+  },
+  methods: {
+    async getWithdrawalWithdrawalLog() {
+        const _ = await withdrawalWithdrawalLog();
+        console.log(_, "提现记录")
+    },
+    goPage(num, status) {
+      console.log(num, "number");
+      if (status) {
+        this.currentpage += num;
+        // 请求分页
+      }
+    },
+    hideCallback() {
+      this.centerDialogVisible2 = false;
+    },
+    async changeStep(e) {
+      this.stepTwoObj = e;
+      console.log( "-------------------")
+      console.log( this.stepTwoObj)
+      const {
+        name,
+        idcard,
+        idcard_img_q,
+        idcard_img_h
+      } = this.form;
+      const {
+        kh_dq,
+        khh,
+        yh_account,
+        yh_img_q,
+        yh_img_h
+      } = e;
+      console.log( getStorage("user").id)
+      const _ = await withdrawalBindBank(
+        getStorage("user").id,
+        name,
+        idcard,
+        idcard_img_q,
+        idcard_img_h,
+        kh_dq,
+        khh,
+        yh_account,
+        yh_img_q,
+        yh_img_h
+      );
+      console.log(_, "绑定状态");
+      if (_.st == 1) {
+        // this.$message.success(_.msg);
+        this.setpStatus++;
+      }
+    },
+    nextStep() {
+        if(this.disable) {
+            return;
+        }
+      this.$refs.form.validate(async (v) => {
+        if (v) {
+          this.success = true;
+          this.setpStatus++;
+        }
+      });
+    },
+    GetCon(val){
+      console.log(val)
+    },
+    GetPageList(pages, re) {
+      this.currentpage = pages ? pages : 1;
+      request({
+        url: "withdrawal/incomeMsg",
+        data: {
+          czz_id: JSON.parse(sessionStorage.getItem('user')).id,
+        },
+      }).then((res) => {
+        if (re != undefined) {
+          res = re;
+        }
+        this.day_income = res.data.day_income;
+        this.withdrawal = res.data.withdrawal;
+        this.djs_income = res.data.djs_income;
+      });
+    },
+    biao(pages, re) {
+      this.biao = pages ? pages : 1;
+      request({
+        url: "withdrawal/allIncome",
+        data: {
+          page: this.currentpage,
+          limit: this.pagesize,
+          czz_id: JSON.parse(sessionStorage.getItem('user')).id,
+          day:this.day,
+          status:this.value5,
+        },
+      }).then((res) => {
+        if (re != undefined) {
+          res = re;
+        }
+        console.log(res);
+        this.tableData = res.data.data;
+        this.TotalRows = res.data.count;
+        for (let i = 0; i < this.tableData.length; i++) {
+          if (this.tableData[i].status == 0) {
+            this.tableData[i].status = "待结算";
+          } else if (this.tableData[i].status == 1) {
+            this.tableData[i].status = "交易完成";
+          }
+        }
+      });
+    },
+    handleCurrentChange(e) {
+      this.GetPageList(e);
+      console.log(e);
+    },
+    handleCurrentChange1(e) {
+      this.txjl(e);
+      console.log(e);
+    },
+    //今日
+    jin() {
+      this.activeDay = 0;
+      request({
+        url: "withdrawal/allIncome",
+        data: {
+          day: this.day,
+          page: this.currentpage,
+          limit: this.pagesize,
+          czz_id: JSON.parse(sessionStorage.getItem('user')).id,
+        },
+      }).then((res) => {
+        console.log(res);
+        this.tableData = res.data.data;
+        this.TotalRows = res.data.count;
+        for (let i = 0; i <= res.data.data.length; i++) {
+          this.tableData = res.data.data;
+          this.TotalRows = res.data.count;
+          if (this.tableData[i].status == 0) {
+            this.tableData[i].status = "待结算";
+          } else if (this.tableData[i].status == 1) {
+            this.tableData[i].status = "交易完成";
+          }
+        }
+      });
+    },
+    //昨日
+    zuo() {
+      this.activeDay = 1;
+
+      request({
+        url: "withdrawal/allIncome",
+        data: {
+          day: this.yesterday,
+          page: this.currentpage,
+          limit: this.pagesize,
+          czz_id: JSON.parse(sessionStorage.getItem('user')).id,
+        },
+      }).then((res) => {
+        console.log(res);
+        this.tableData = res.data.data;
+        this.TotalRows = res.data.count;
+        for (let i = 0; i <= res.data.data.length; i++) {
+          this.tableData = res.data.data;
+          this.TotalRows = res.data.count;
+          if (this.tableData[i].status == 0) {
+            this.tableData[i].status = "待结算";
+          } else if (this.tableData[i].status == 1) {
+            this.tableData[i].status = "交易完成";
+          }
+        }
+      });
+    },
+    //近7天
+    seven() {
+      this.activeDay = 2;
+
+      request({
+        url: "withdrawal/allIncome",
+        data: {
+          day: this.sevenday,
+          page: this.currentpage,
+          limit: this.pagesize,
+          czz_id: JSON.parse(sessionStorage.getItem('user')).id,
+        },
+      }).then((res) => {
+        console.log(res);
+        this.tableData = res.data.data;
+        this.TotalRows = res.data.count;
+        for (let i = 0; i <= res.data.data.length; i++) {
+          this.tableData = res.data.data;
+          this.TotalRows = res.data.count;
+          if (this.tableData[i].status == 0) {
+            this.tableData[i].status = "待结算";
+          } else if (this.tableData[i].status == 1) {
+            this.tableData[i].status = "交易完成";
+          }
+        }
+      });
+    },
+    //近30天
+    thirty() {
+      this.activeDay = 3;
+
+      request({
+        url: "withdrawal/allIncome",
+        data: {
+          day: this.thirtyday,
+          page: this.currentpage,
+          limit: this.pagesize,
+          czz_id: JSON.parse(sessionStorage.getItem('user')).id,
+        },
+      }).then((res) => {
+        console.log(res);
+        this.tableData = res.data.data;
+        this.TotalRows = res.data.count;
+        for (let i = 0; i <= res.data.data.length; i++) {
+          this.tableData = res.data.data;
+          this.TotalRows = res.data.count;
+          if (this.tableData[i].status == 0) {
+            this.tableData[i].status = "待结算";
+          } else if (this.tableData[i].status == 1) {
+            this.tableData[i].status = "交易完成";
+          }
+        }
+      });
+    },
+    //绑定银行卡
+    bangding() {
+        if(this.bankMsg.id) {
+            this.$message.info("已绑定过银行卡")
+            return;
+        }
+      this.centerDialogVisible1 = true;
+    },
+    //去绑定
+    bang() {
+      this.centerDialogVisible2 = true;
+      Promise.resolve().then((_) => {
+        this.centerDialogVisible1 = false;
+      });
+    },
+    //步骤条下一步
+    next() {
+      if (this.active++ > 1) {
+        this.centerDialogVisible2 = false;
+        this.centerDialogVisible1 = false;
+      }
+    },
+    next1() {
+      if (this.active1++ > 0) {
+        this.centerDialogVisible3 = false;
+      }
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handleRemove1(file, fileList) {
+      console.log(file, fileList);
+    },
+    handleRemove2(file, fileList) {
+      console.log(file, fileList);
+    },
+    handleRemove3(file, fileList) {
+      console.log(file, fileList);
+    },
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    handlePictureCardPreview1(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    handlePictureCardPreview2(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    handlePictureCardPreview3(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    //更换银行卡
+    ghyhk() {
+      this.centerDialogVisible3 = true;
+    },
+    //提现记录
+    txjl(pages, re, show = false) {
+      this.centerDialogVisible5 = show;
+      this.currentpage1 = pages ? pages : 1;
+      request({
+        url: "withdrawal/withdrawalLog",
+        data: {
+          page: this.currentpage1,
+          limit: this.pagesize1,
+          czz_id: JSON.parse(sessionStorage.getItem('user')).id,
+        },
+      }).then((res) => {
+        if (re != undefined) {
+          res = re;
+        }
+        console.log(res.data.data[0], 'res.data.data');
+        this.bankMsg = {...res.data.data[0]};
+        this.tableData1 = res.data.data;
+        this.TotalRows1 = res.data.count;
+        this.add_time = res.data.data.add_time;
+        this.money = res.data.data.money;
+        this.dzyh = res.data.data.dzyh;
+        this.status = res.data.data.status;
+        this.sn = res.data.data.sn;
+        this.bz1 = res.data.data.bz1;
+      });
+    },
+    //确认提现按钮
+    qrtx() {
+      if (this.active2 == 0) {
+        this.bz = true;
+      } else if (this.active2 == 1) {
+        this.bz = true;
+      }
+      if (this.active2++ > 1) {
+        this.centerDialogVisible4 = false;
+      }
+    },
+    //提现
+    tixian() {
+      if (this.weibang == true) {
+        this.centerDialogVisible1 = true;
+      } else {
+        this.centerDialogVisible4 = true;
+      }
+    },
+    //筛选
+    shaixuan() {
+      request({
+        url: "withdrawal/withdrawalLog",
+        data: {
+          page: this.currentpage1,
+          limit: this.pagesize1,
+          czz_id:JSON.parse(sessionStorage.getItem('user')).id,
+          time_start: this.value10,
+          time_end: this.value11,
+          status: this.value12,
+        },
+      }).then((res) => {
+        this.tableData1 = res.data.data;
+        this.TotalRows1 = res.data.count;
+        this.add_time = res.data.data.add_time;
+        this.money = res.data.data.money;
+        this.dzyh = res.data.data.dzyh;
+        this.status = res.data.data.status;
+        this.sn = res.data.data.sn;
+        this.bz1 = res.data.data.bz1;
+      });
+    },
+    namebl(){
+      this.form.name = this.form.name.replace(/[^\u4E00-\u9FA5]/g, ''); // 清除除了中文以外的输入的字符
+        if(this.form.name.length>=2){
+          this.duihao=true;
+        }else{
+          this.duihao=false;
+        }
+    },
+    sfzbl(){
+      if(this.form.idcard.length==18){
+        this.duihao1=true;
+        console.log(this.form.idcard.length);
+      }else{
+        this.duihao1=false;
+      }
+    },
+    daochu() {
+      // request({
+      //     url: 'withdrawal/expole',
+      //     data: {
+      //         data:this.tableData
+      //     }
+      // }).then(res => {
+      //
+      // })
+      // request({
+      //     url: 'withdrawal/expole',
+      //     data: {
+      //         page: this.currentpage,
+      //         limit: this.pagesize,
+      //         czz_id:JSON.parse(sessionStorage.getItem('user')).id,
+      //     }
+      // }).then(res => {
+      //
+      // })
+      window.location.href =
+        "https://bkmcsapi.heyhui.com/teacher/Withdrawal/expole?limit=" +
+        this.pagesize +
+        "&page=" +
+        this.currentpage +
+        "&czz_id=JSON.parse(sessionStorage.getItem('user')).id";
+  },
+    //收益趋势
+    qushi(){
+      request({
+        url:'Withdrawal/inCome_icon',
+        data:{
+            czz_id:JSON.parse(sessionStorage.getItem('user')).id,
+            day: this.value13,
+        },
+      }).then(res=>{
+          this.qsdate=res.data.date;
+          this.qsdata=res.data.data;
+        // 基于准备好的dom，初始化echarts实例
+        let myChart = this.$echarts.init(document.getElementById("box1"));
+        // 绘制图表
+        myChart.setOption({
+          grid: {
+            // top:"0px",
+
+            left: "70px",
+
+            // right:"5px",
+
+            bottom: "50px",
+
+            // backgroundColor: '#fff',
+
+            width: "auto", //图例宽度
+
+            height: "100%", //图例高度
+          },
+          xAxis: {
+            type: "category",
+            boundaryGap: false,
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: "#C8C8D3", //更改坐标轴文字颜色
+                fontSize: 14, //更改坐标轴文字大小
+              },
+            },
+            axisLine: {
+              lineStyle: {
+                color: "#F5F5FA", //更改坐标轴颜色
+              },
+            },
+          },
+          yAxis: {
+            type: "value",
+            boundaryGap: [0, "30%"],
+            axisLabel: {
+              show: true,
+              textStyle: {
+                color: "#C8C8D3", //更改坐标轴文字颜色
+                fontSize: 14, //更改坐标轴文字大小
+              },
+            },
+            axisLine: {
+              show: false,
+              lineStyle: {
+                color: "#F5F5FA", //更改坐标轴颜色
+              },
+            },
+          },
+          visualMap: {
+            type: "piecewise",
+            show: false,
+            dimension: 0,
+            seriesIndex: 0,
+            pieces: [
+              {
+                gt: 0,
+                lt: 8,
+                color: "#FF6246",
+              },
+            ],
+          },
+          series: [
+            {
+              showSymbol: false,
+              lineWidth: 2,
+              type: "line",
+              smooth: 0.6,
+              symbol: "emptyCircle",
+              lineStyle: {
+                color: "#FF6246",
+                width: 1,
+              },
+              markLine: {
+                symbol: ["emptyCircle", "emptyCircle"],
+                label: { show: false },
+              },
+              borderWidth: 1,
+              areaStyle: {
+                normal: {
+                  //右，下，左，上
+                  color: new echarts.graphic.LinearGradient(
+                          0,
+                          0,
+                          0,
+                          1,
+                          [
+                            {
+                              offset: 0,
+                              color: "#FF6246",
+                            },
+                            {
+                              offset: 1,
+                              color: "#ffffff",
+                            },
+                          ],
+                          false
+                  ),
+                },
+              },
+              data: [
+                ["2019-10-10".replace(/\d{0,4}-(\d+-)(\d+)/g, "$1$2"), 200],
+                ["2019-10-11".replace(/\d{0,4}-(\d+-)(\d+)/g, "$1$2"), 560],
+                ["2019-10-12".replace(/\d{0,4}-(\d+-)(\d+)/g, "$1$2"), 750],
+                ["2019-10-13".replace(/\d{0,4}-(\d+-)(\d+)/g, "$1$2"), 580],
+                ["2019-10-14".replace(/\d{0,4}-(\d+-)(\d+)/g, "$1$2"), 250],
+                ["2019-10-15".replace(/\d{0,4}-(\d+-)(\d+)/g, "$1$2"), 300],
+                ["2019-10-16".replace(/\d{0,4}-(\d+-)(\d+)/g, "$1$2"), 450],
+                ["2019-10-17".replace(/\d{0,4}-(\d+-)(\d+)/g, "$1$2"), 300],
+                ["2019-10-18".replace(/\d{0,4}-(\d+-)(\d+)/g, "$1$2"), 100],
+              ],
+            },
+          ],
+          tooltip: {
+            axisPointer: {
+              // 坐标轴指示器配置项。
+              type: "none", // 'line' 直线指示器  'shadow' 阴影指示器  'none' 无指示器  'cross' 十字准星指示器。
+              axis: "auto", // 指示器的坐标轴。
+              snap: true, // 坐标轴指示器是否自动吸附到点上
+            },
+            renderMode: "html",
+            padding: 5, // 提示框浮层内边距，
+            extraCssText: "box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);", // 额外附加到浮层的 css 样式
+            confine: true, // 是否将 tooltip 框限制在图表的区域内。
+            trigger: "axis",
+            formatter: function(params) {
+              console.log(params, "params");
+              return `¥${params[0].data[1]}`;
+            },
+            position: "top",
+          },
+        });
+      })
+    }
+  },
+};
+</script>
+
+<style scoped lang="scss">
+.drawMoney {
+    ::v-deep .el-dialog {
+        border-radius: 12px;
+    }
+  .drawHistory {
+    font-size: 24px;
+    font-family: PingFang SC;
+    font-weight: 600;
+    line-height: 33px;
+    color: #37373b;
+    opacity: 1;
+    margin-left: 3%;
+    
+  }
+  ::v-deep .el-dialog__header {
+      padding-top: 40px!important;
+      border-bottom: 1px solid #F5F5FA;
+      padding-bottom: 26px!important;
+  }
+  ::v-deep .el-dialog__headerbtn {
+      top: 40px
+  }
+  ::v-deep .el-dialog__body {
+      padding-top: 30px;
+      padding-left: 3%;
+      padding-right: 3%;
+  }
+  .dayChose {
+    font-size: 14px;
+    font-family: PingFang SC;
+    font-weight: 400;
+    line-height: 20px;
+    color: #9E9EA6;
+    opacity: 1;
+    margin-right: 20px;
+  }
+  .picker {
+      width: 148px!important;
+      border-radius: 8px!important;
+  }
+  .drawBox {
+    display: flex;
+    align-items: center;
+    
+    .drawStatus {
+        font-size: 14px;
+        font-family: PingFang SC;
+        font-weight: 400;
+        line-height: 20px;
+        color: #9E9EA6;
+        white-space: nowrap;
+        opacity: 1;
+        margin: 0 24px 0 40px;
+    }
+    .statusSelect {
+        width: 178px;
+        height: 45px;
+        margin-right: 40px;
+    }
+    .choseBtn  {
+        width: 109px;
+        height: 40px;
+        background: #FF6246;
+        opacity: 1;
+        border-radius: 5px;
+        border: none;
+        margin-top: -5px;
+    }
+  }
+  ::v-deep thead tr th{
+    background: #F5F5FA;
+    opacity: 1;
+    height: 71px;
+    // text-align: center;
+  }
+  ::v-deep .cell {
+    font-size: 14px;
+    font-family:PingFang PingFang SC-Regular;
+    font-weight: 400;
+    line-height: 20px;
+    color: #68686F;
+    opacity: 1;
+  }
+  
+}
+.green {
+    font-size: 14px;
+    font-family: PingFang SC;
+    font-weight: 400;
+    line-height: 20px;
+    color: #1FCD81;
+    opacity: 1;
+  }
+.pagation {
+    display: flex;
+    justify-content: flex-end;
+}
+.nr {
+  width: 100%;
+  height: 100%;
+}
+
+.el-card {
+  height: 150px;
+  border-radius: 10px;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  border: none;
+}
+
+.box-card {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  margin-top: 12px;
+  justify-content: space-between;
+  //align-items: center;
+}
+
+.box-card1 {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.card-left {
+  width: 70%;
+  height: 100%;
+}
+
+.card-right {
+  // width: 30%;
+  height: 100%;
+}
+
+.card-right_tx {
+  width: 40%;
+  height: 100%;
+  display: flex;
+  margin-left: 20%;
+}
+
+.card-right div {
+  display: flex;
+  align-items: center;
+}
+
+.card-right_tx div {
+  height: 100%;
+  width: 50%;
+  display: flex;
+  justify-content: flex-start;
+  color: #ff7e67;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#el-card {
+  width: 100%;
+  height: 480px;
+}
+
+.card_nr {
+  width: 100%;
+  height: 500px;
+}
+
+.card_nr_top {
+  width: 100%;
+  margin-left: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .left {
+    display: flex;
+    align-items: center;
+  }
+}
+
+#box1 {
+  width: 100%;
+  height: 70%;
+  margin-top: 5px;
+}
+
+#el-card1 {
+  width: 100%;
+  height: 480px;
+}
+
+.card-left1 {
+  width: 100%;
+  height: 450px;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-left1_top {
+  width: 100%;
+  height: 20%;
+  display: flex;
+  text-indent: 10px;
+  align-items: center;
+  color: #333333;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.card-left1_center {
+  height: 60%;
+  //padding-left: 10%;
+  //padding-right: 10%;
+
+  position: relative;
+  display: inline-block;
+}
+
+.card-left1_center_yhk {
+  width: 100%;
+  //height: 243px;
+  //background: #A22222;
+
+  opacity: 1;
+  border-radius: 12px;
+}
+
+.card-left1_center_nr {
+  color: #ffffff;
+  position: absolute;
+  top: 50%;
+  left: 20%;
+  font-size: 29px;
+}
+
+/*.card-left1_center_xx{*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*    position: absolute;*/
+/*    top:70%;*/
+/*    left: 20%;*/
+/*}*/
+.card-left1_center_xx_ckr {
+  position: absolute;
+  top: 65%;
+  left: 20%;
+  line-height: 1.5em;
+}
+
+.card-left1_center_xx_ssh {
+  position: absolute;
+  top: 65%;
+  left: 40%;
+  line-height: 1.5em;
+}
+
+.ghyhk {
+  width: 100%;
+  height: 20%;
+  display: flex;
+  border-radius: 10px;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.ghyhk_nr {
+  width: 75%;
+  height: 80%;
+  line-height: 100%;
+  background-color: #f5f5fa;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.ghyhk_nr_nr {
+  width: 35%;
+  height: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+#el-card2 {
+  width: 100%;
+  height: 100%;
+  ::v-deep .el-card__body {
+    padding: 0 !important;
+  }
+}
+
+.box-card2 {
+  width: 100%;
+  height: 450px;
+  display: flex;
+  flex-direction: column;
+}
+
+.box-card2_center {
+  height: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.box-card2_center_zt {
+  display: flex;
+  align-items: center;
+}
+
+.sctp {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.dzzh {
+  display: flex;
+  align-items: flex-start;
+  background-color: #f5f5fa;
+}
+
+.txgz {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.jine .el-input__inner {
+  border-top: none !important;
+  border-left: none;
+  border-right: none;
+}
+
+.txjl_top {
+  display: flex;
+  align-items: center;
+//   justify-content: space-between;
+}
+@import url("./czsy.scss");
+.input ::v-deep input {
+  background: #f5f5fa;
+  border-radius: 5px;
+  border: none;
+}
+.upload2 {
+  margin-left: 14px;
+}
+
+.daochu {
+  color: #3c52e0;
+  cursor: pointer;
+}
+.daochu:hover {
+  color: #7384f3;
+}
+.daochu:focus {
+  color: #2439c5 !important;
+}
+
+::v-deep .el-select,
+.el-date-editor {
+  width: 80%;
+  height: 45px;
+}
+::v-deep .el-date-editor input {
+  padding-left: 20px;
+}
+::v-deep .el-date-editor {
+  width: 148px !important;
+}
+
+::v-deep .el-input__prefix {
+  left: 80% !important;
+}
+.m-l-48 {
+  margin-left: 48px;
+}
+.btn48,
+.btn74 {
+  display: flex;
+  cursor: pointer;
+  margin-right: 8px;
+  justify-content: center;
+  align-items: center;
+  width: 42px;
+  height: 42px;
+  background: #f5f5fa;
+  text-align: center;
+  border: none;
+  opacity: 1;
+  border-radius: 5px;
+  font-size: 18px;
+  font-family: "PingFang SC";
+  font-weight: 400;
+  line-height: 25px;
+  color: #c8c8d3;
+}
+.btn74 {
+  width: 74px;
+}
+.samllText {
+  font-size: 14px;
+  font-family: PingFang SC;
+  font-weight: 400;
+  line-height: 20px;
+  color: #9e9ea6;
+  opacity: 1;
+}
+::v-deep .el-table__header {
+  border-radius: 11px 11px 0px 0px;
+  overflow: hidden;
+}
+.page {
+  width: 77px;
+  height: 40px;
+  background: #c8c8d3;
+  opacity: 1;
+  border-radius: 5px;
+  font-size: 14px;
+  font-family: PingFang SC;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: center;
+  line-height: 40px;
+  color: #ffffff;
+}
+::v-deep .el-pager li {
+  width: 40px;
+  height: 40px;
+  background: #ffeae2;
+  opacity: 1;
+  border-radius: 5px;
+  text-align: center;
+  line-height: 40px;
+}
+.yellow {
+  background: #ff6246 !important;
+}
+.point {
+  cursor: pointer;
+}
+.active {
+  background: #3c52e0 !important;
+  color: #fff !important;
+}
+::v-deep .el-button {
+  &:hover {
+    background: none;
+  }
+}
+
+::v-deep .echart-tooltip-wrap {
+  background-color: #0a3f54;
+  padding: 12px/0.833;
+  display: inline-block;
+  transform: scale(0.833);
+  transform-origin: 0% 0%;
+}
+
+::v-deep .el-icon-plus {
+    margin-bottom: 0!important;
+    font-size: 55px!important;
+}
+.gray {
+    background: #C8C8D3;
+    color: white;
+    
+}
+
+.dis {
+    ::v-deep .el-button:focus, .el-button:hover {
+        background: #C8C8D3!important;
+        border: none!important;
+    }
+}
+.bind_card {
+    display: flex;
+    justify-content: center;
+}
+.banMsk {
+    span {
+        display: block;
+        line-height: '' !important;
+    }
+}
+.flex_center {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 50%;
+}
+
+
+</style>
